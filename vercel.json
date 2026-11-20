@@ -3,7 +3,7 @@
   "framework": "express",
   "buildCommand": "npm run build",
   "functions": {
-    "server.ts": {
+    "app.mjs": {
       "includeFiles": "{.env.local,public/**}"
     }
   }
