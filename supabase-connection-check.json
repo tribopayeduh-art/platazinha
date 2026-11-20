@@ -1,0 +1,86 @@
+{
+  "observedAt": "2026-10-20T02:31:12.824Z",
+  "provider": "supabase",
+  "readOnly": true,
+  "ok": true,
+  "checks": [
+    {
+      "name": "inex_get_document",
+      "ok": true,
+      "durationMs": 5829
+    },
+    {
+      "name": "inex_scan_collection",
+      "ok": true,
+      "durationMs": 5718
+    },
+    {
+      "name": "inex_recent_documents",
+      "ok": true,
+      "durationMs": 5712
+    },
+    {
+      "name": "inex_user_by_email",
+      "ok": true,
+      "durationMs": 269
+    },
+    {
+      "name": "inex_revision_snapshot",
+      "ok": true,
+      "durationMs": 266
+    },
+    {
+      "name": "inex_admin_metrics",
+      "ok": true,
+      "durationMs": 7503
+    },
+    {
+      "name": "inex_admin_integrity",
+      "ok": true,
+      "durationMs": 547
+    },
+    {
+      "name": "config:g_gen_dino",
+      "ok": true,
+      "durationMs": 224
+    },
+    {
+      "name": "config:g_block_puzzle",
+      "ok": true,
+      "durationMs": 233
+    },
+    {
+      "name": "config:g_zumbla",
+      "ok": true,
+      "durationMs": 215
+    },
+    {
+      "name": "config:g_raspa_fortuna",
+      "ok": true,
+      "durationMs": 201
+    },
+    {
+      "name": "config:g_subway_pay",
+      "ok": true,
+      "durationMs": 216
+    },
+    {
+      "name": "config:g_bubble_blast",
+      "ok": true,
+      "durationMs": 207
+    },
+    {
+      "name": "config:g_count_masters",
+      "ok": true,
+      "durationMs": 221
+    }
+  ],
+  "revisionCollections": 33,
+  "integrity": {
+    "negativePlayerWallets": 0,
+    "negativeAffiliateWallets": 0,
+    "betsWithoutCurrentUser": 1,
+    "affiliatesWithoutCurrentUser": 0,
+    "canonicalGameConfigs": 7
+  }
+}

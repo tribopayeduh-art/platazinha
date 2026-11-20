@@ -1,0 +1,47 @@
+{
+  "checkedAt": "2026-10-19T17:14:53.258Z",
+  "measurements": [
+    {
+      "query": "full_history",
+      "documents": 8020,
+      "ms": 12260
+    },
+    {
+      "query": "recent_200",
+      "documents": 200,
+      "ms": 267
+    }
+  ],
+  "games": [
+    {
+      "id": "g_bubble_blast",
+      "configReadable": true,
+      "ms": 159
+    },
+    {
+      "id": "g_subway_pay",
+      "configReadable": true,
+      "ms": 173
+    },
+    {
+      "id": "g_gen_dino",
+      "configReadable": true,
+      "ms": 160
+    },
+    {
+      "id": "g_block_puzzle",
+      "configReadable": true,
+      "ms": 253
+    },
+    {
+      "id": "g_zumbla",
+      "configReadable": true,
+      "ms": 136
+    },
+    {
+      "id": "g_raspa_fortuna",
+      "configReadable": true,
+      "ms": 152
+    }
+  ]
+}

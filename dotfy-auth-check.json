@@ -1,0 +1,5 @@
+{
+  "endpoint": "GET /api/auth/me",
+  "httpStatus": "200",
+  "authenticated": true
+}

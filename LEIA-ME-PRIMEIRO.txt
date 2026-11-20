@@ -1,0 +1,9 @@
+iNEX — Supabase exclusivo
+
+Este ZIP inclui sua chave secreta no .env.local. Mantenha-o privado.
+
+Na pasta do package.json: npm install, depois npm run db:check, depois npm run dev.
+Abra http://localhost:3000
+Admin: http://localhost:3000/admin
+
+Leia SUPABASE-ATIVACAO.md sobre chaves de criptografia e integrações externas.
