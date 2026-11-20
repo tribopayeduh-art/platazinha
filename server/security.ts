@@ -1,3 +1,4 @@
+import {deriveServerVapidKeys} from './pushVapid.ts';
 import type { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import fs from 'fs';
@@ -160,10 +161,9 @@ export function resolveVapidKeys(): { publicKey: string; privateKey: string } {
     return { publicKey: pub, privateKey: priv };
   }
   const vault = readSecureVault();
-  return {
-    publicKey: pub || vault.VAPID_PUBLIC_KEY || '',
-    privateKey: priv || vault.VAPID_PRIVATE_KEY || ''
-  };
+  if(pub||priv)return {publicKey:'',privateKey:''};
+  if(vault.VAPID_PUBLIC_KEY&&vault.VAPID_PRIVATE_KEY)return {publicKey:vault.VAPID_PUBLIC_KEY,privateKey:vault.VAPID_PRIVATE_KEY};
+  return deriveServerVapidKeys(process.env.SYSTEM_ENCRYPTION_KEY||process.env.JWT_SECRET);
 }
 
 /**

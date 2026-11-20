@@ -222,7 +222,7 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
   }
 
   try {
-    const reg = await navigator.serviceWorker.register('/sw.js?v=pwa-push-v10', { scope: '/', updateViaCache: 'none' });
+    const reg = await navigator.serviceWorker.register('/sw.js?v=pwa-push-v11', { scope: '/', updateViaCache: 'none' });
     await reg.update();
     swRegistration = reg;
     console.log('Service Worker registrado com sucesso:', reg.scope);
@@ -230,7 +230,7 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
     // Escuta evento do Service Worker quando um push em segundo plano for recebido
     if (!navigator.serviceWorker.onmessage) {
       navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'PUSH_RECEIVED') {
+        if (event.data && event.data.type === 'PUSH_RECEIVED' && !event.data.silent) {
           playSaleSound();
         }
       });
@@ -397,8 +397,8 @@ export async function triggerSaleNotification(options: {
     const show = () => {
       new Notification(title, {
         body,
-        icon: '/allifavicon.png',
-        badge: '/allifavicon.png',
+        icon: '/notification-x.png',
+        badge: '/notification-x.png',
       });
     };
 
@@ -455,8 +455,8 @@ export async function triggerNewAffiliateNotification(options?: {
     const show = () => {
       new Notification(title, {
         body,
-        icon: '/allifavicon.png',
-        badge: '/allifavicon.png',
+        icon: '/notification-x.png',
+        badge: '/notification-x.png',
       });
     };
 
@@ -519,8 +519,8 @@ export async function triggerAffiliateEventNotification(options: {
   if ('Notification' in window && Notification.permission === 'granted') {
     new Notification(options.title, {
       body,
-      icon: '/allifavicon.png',
-      badge: '/allifavicon.png',
+      icon: '/notification-x.png',
+      badge: '/notification-x.png',
       data: { url: options.url || '/?tab=affiliates' }
     });
     return true;

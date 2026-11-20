@@ -4,7 +4,8 @@
   "buildCommand": "npm run build",
   "functions": {
     "app.mjs": {
-      "includeFiles": "{.env.local,public/**}"
+      "includeFiles": "public/**",
+      "maxDuration": 300
     }
   }
 }

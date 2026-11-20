@@ -980,6 +980,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         body: JSON.stringify({
           title: payload.title,
           body: payload.message,
+          requestId: crypto.randomUUID(),
           target: payload.target,
           targetUserId: payload.targetUserId
         })

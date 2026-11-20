@@ -1,9 +1,19 @@
-iNEX — Supabase exclusivo
+iNEX — Central de notificações do admin
 
-Este ZIP inclui sua chave secreta no .env.local. Mantenha-o privado.
+Esta versão está preparada para o repositório tribopayeduh-art/platazinha.
+Consulte NOTIFICACOES-ADMIN.md para recursos, regras e configuração.
 
-Na pasta do package.json: npm install, depois npm run db:check, depois npm run dev.
-Abra http://localhost:3000
-Admin: http://localhost:3000/admin
+1. Extraia o ZIP em uma pasta permanente.
+2. Substitua os arquivos da pasta do repositório por estes arquivos.
+3. Envie o commit ao GitHub e publique esse commit na Vercel.
+4. Confirme em Settings > Git se a Vercel está ligada ao repositório correto.
+5. No admin, abra Configurações > Notificações.
 
-Leia SUPABASE-ATIVACAO.md sobre chaves de criptografia e integrações externas.
+O ZIP não inclui .env.local nem credenciais privadas. Mantenha as variáveis
+Production já cadastradas na Vercel. Para testar localmente, copie seu
+.env.local da versão anterior para a pasta onde está package.json.
+
+Validação local: npm ci, npm run lint, npm run build.
+Desenvolvimento local: npm run dev (porta padrão 3000).
+
+Campanhas não foram disparadas a usuários durante os testes.

@@ -24,9 +24,10 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: body,
-    icon: data.icon || '/icon-192.png',
-    badge: data.badge || '/icon-192.png',
-    vibrate: [200, 100, 200, 100, 200],
+    icon: data.icon || '/notification-x.png',
+    badge: data.badge || '/notification-badge.png',
+    silent: data.silent === true,
+    ...(data.silent ? {} : { vibrate: [200, 100, 200] }),
     tag: data.tag || ('push-notif-' + Date.now()),
     renotify: true,
     data: { url: url, timestamp: Date.now(), ...data },
@@ -38,6 +39,7 @@ self.addEventListener('push', (event) => {
         clientList.forEach((client) => {
           client.postMessage({
             type: 'PUSH_RECEIVED',
+            silent: data.silent === true,
             title,
             body,
             url,
@@ -80,9 +82,10 @@ self.addEventListener('message', (event) => {
 
     const options = {
       body: body,
-      icon: data.icon || '/icon-192.png',
-      badge: data.badge || '/icon-192.png',
-      vibrate: [200, 100, 200, 100, 200],
+      icon: data.icon || '/notification-x.png',
+      badge: data.badge || '/notification-badge.png',
+      silent: data.silent === true,
+    ...(data.silent ? {} : { vibrate: [200, 100, 200] }),
       tag: 'app-notif-' + Date.now(),
       renotify: true,
       data: { url: url, ...data }
@@ -95,7 +98,8 @@ self.addEventListener('message', (event) => {
 // Ao clicar na notificação, abre/foca o aplicativo
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const targetUrl = new URL((event.notification.data && event.notification.data.url) || '/', self.location.origin).href;
+  const requested = new URL((event.notification.data && event.notification.data.url) || '/', self.location.origin);
+  const targetUrl = requested.origin === self.location.origin ? requested.href : self.location.origin;
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {

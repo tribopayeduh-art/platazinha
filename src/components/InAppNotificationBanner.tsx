@@ -58,7 +58,7 @@ export const InAppNotificationBanner: React.FC = () => {
               {/* App Icon */}
               <div className="relative flex-shrink-0">
                 <img
-                  src="/allifavicon.png"
+                  src="/notification-x.png"
                   alt="iNEX"
                   className="w-10 h-10 rounded-xl object-cover border border-white/10 shadow-sm"
                   onError={(e) => {

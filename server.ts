@@ -1,3 +1,4 @@
+import {validateNotification,selectNotificationAudience,notificationTargetLabels,isTrustedPushEndpoint} from './server/notificationPolicy.ts';
 import {reservePixupDeposit,finishPixupDeposit,bindPixupConfirmation} from './server/pixupDepositIntent.ts';
 import QRCode from 'qrcode';
 import { PIXUP_DEPOSIT_REFERENCE, matchesPixupDeposit, parsePixupDepositEvent, pixupDepositCents } from './server/pixupDeposits.ts';
@@ -823,7 +824,7 @@ async function startServer() {
   app.post('/api/push/subscribe', async (req: AuthRequest, res) => {
     try {
       const { subscription, preferences } = req.body;
-      if (!subscription || !subscription.endpoint) {
+      if (!subscription || !isTrustedPushEndpoint(subscription.endpoint) || !subscription.keys?.p256dh || !subscription.keys?.auth) {
         return res.status(400).json({ error: 'Subscription inválida' });
       }
 
@@ -902,7 +903,7 @@ async function startServer() {
         const docId = subscriptionDocumentId(endpoint);
         const subs = await dbService.getPushSubscriptions();
         const found = subs.find(s => s.endpoint === endpoint || s.id === docId);
-        if (found) {
+        if (found && found.userId === targetUserId) {
           found.preferences = { ...(found.preferences || {}), ...(preferences || {}) };
           if (targetUserId && (!found.userId || found.userId === 'guest')) {
             found.userId = targetUserId;
@@ -934,7 +935,7 @@ async function startServer() {
       if (endpoint) {
         const docId = subscriptionDocumentId(endpoint);
         const allSubs = await dbService.getPushSubscriptions();
-        const targetSub = allSubs.find(s => s.endpoint === endpoint || s.id === docId);
+        const targetSub = allSubs.find(s => s.userId === targetUserId && (s.endpoint === endpoint || s.id === docId));
         if (targetSub) {
           try {
             await webpush.sendNotification(targetSub.subscription as any, JSON.stringify({
@@ -991,7 +992,7 @@ async function startServer() {
         if (endpoint) {
           const docId = subscriptionDocumentId(endpoint);
           const allSubs = await dbService.getPushSubscriptions();
-          const targetSub = allSubs.find(s => s.endpoint === endpoint || s.id === docId);
+          const targetSub = allSubs.find(s => s.userId === targetUserId && (s.endpoint === endpoint || s.id === docId));
           if (targetSub) {
             try {
               await webpush.sendNotification(targetSub.subscription as any, JSON.stringify({
@@ -4256,262 +4257,78 @@ CREATE TABLE IF NOT EXISTS system_settings (
     }
   });
 
-  interface AdminAffiliateNotificationLog {
-    id: string;
-    title: string;
-    body: string;
-    target: string;
-    targetLabel: string;
-    sentCount: number;
-    totalEligibleAffiliates: number;
-    createdAt: string;
-    sentBy: string;
+  // Campaign delivery is admin-only; permission checks run before reading any audience.
+  function canNotify(req: AuthRequest, res: Response) {
+    if (!checkAdminPermission(req,'canSendNotifications')) {res.status(403).json({error:'Sua conta não tem permissão para enviar notificações.'});return false;}
+    return true;
   }
-  const adminAffiliateNotificationLogs: AdminAffiliateNotificationLog[] = [];
-
-  // GET /api/admin/notifications (List recent dispatches and affiliate push stats)
-  app.get('/api/admin/notifications', requireAdmin, async (req: AuthRequest, res: Response) => {
-    try {
-      const [allUsers, allAffiliates, allReferrals] = await Promise.all([
-        dbService.getAllUsers(),
-        dbService.getAllAffiliates(),
-        dbService.getAllReferrals()
-      ]);
-
-      const affiliateUserIds = new Set<string>();
-      for (const a of allAffiliates) {
-        if (a.userId) affiliateUserIds.add(a.userId);
-      }
-      for (const u of allUsers) {
-        if (u.role === 'affiliate' || (u as any).isInfluencer || (u as any).isAffiliate) {
-          affiliateUserIds.add(u.id);
-        }
-      }
-
-      const referralsCountByAffiliateId = new Map<string, number>();
-      for (const ref of allReferrals) {
-        referralsCountByAffiliateId.set(ref.affiliateId, (referralsCountByAffiliateId.get(ref.affiliateId) || 0) + 1);
-      }
-
-      const affiliateSubscriptions = await dbService.getPushSubscriptions(affiliateUserIds);
-      const subscribedUserIds = new Set(affiliateSubscriptions.map((item) => item.userId));
-      const subscribedAffiliates = subscribedUserIds.size;
-      const persistedHistory = await dbService.getAdminNotificationLogs(50);
-      const history = persistedHistory.length > 0 ? persistedHistory : adminAffiliateNotificationLogs;
-
-      const affiliatesList = [];
-      for (const uid of affiliateUserIds) {
-        const u = allUsers.find(user => user.id === uid);
-        const aff = allAffiliates.find(a => a.userId === uid || a.id === uid);
-        if (u) {
-          const hasPush = subscribedUserIds.has(uid);
-          const refs = aff ? (referralsCountByAffiliateId.get(aff.id) || 0) : 0;
-          affiliatesList.push({
-            userId: u.id,
-            name: u.name || u.email.split('@')[0],
-            email: u.email,
-            phone: u.phone || '',
-            referralCode: aff?.referralCode || u.referralCode || '',
-            isInfluencer: Boolean((u as any).isInfluencer && u.role !== 'affiliate'),
-            hasPush,
-            affiliateBalance: aff?.affiliateBalance ?? (u as any).affiliateBalance ?? 0,
-            commissionTotal: aff?.commissionTotal ?? 0,
-            indicationsCount: refs,
-            registeredGame: u.registeredGame || (u as any).acquisitionGame || 'g_block_puzzle',
-            createdAt: aff?.createdAt || u.createdAt || '',
-          });
-        }
-      }
-
-      res.json({
-        totalAffiliates: affiliateUserIds.size,
-        subscribedAffiliates,
-        history,
-        affiliates: affiliatesList
-      });
-    } catch (err: any) {
-      console.error('Error fetching admin notifications info:', err);
-      res.status(500).json({ error: 'Erro ao carregar dados de notificações.' });
-    }
+  async function notificationAudience(input:any) {
+    const config=validateNotification(input);
+    const [users,affiliates,referrals]=await Promise.all([dbService.getAllUsers(),dbService.getAllAffiliates(),dbService.getAllReferrals()]);
+    const eligible=selectNotificationAudience(users,affiliates,referrals,config);
+    const subscriptions=eligible.length?await dbService.getPushSubscriptions(new Set(eligible.map(u=>u.id))):[];
+    const unique=[...new Map(subscriptions.filter(s=>eligible.some(u=>u.id===s.userId)&&isTrustedPushEndpoint(s.endpoint)&&(s.preferences as any)?.campaigns!==false).map(s=>[s.endpoint,s])).values()];
+    return {config,eligible,subscriptions:unique};
+  }
+  app.get('/api/admin/notifications',requireAdmin,async(req:AuthRequest,res:Response)=>{
+    if(!canNotify(req,res))return;
+    try{
+      const [users,affiliates,history]=await Promise.all([dbService.getAllUsers(),dbService.getAllAffiliates(),dbService.getAdminNotificationLogs(50)]);
+      const available=users.filter(u=>!u.isBlocked&&!['admin','superadmin'].includes(u.role));
+      const subscriptions=available.length?await dbService.getPushSubscriptions(new Set(available.map(u=>u.id))):[];
+      const subscribed=new Set(subscriptions.map(s=>s.userId));
+      res.json({pushConfigured:!!(VAPID_PUBLIC_KEY&&VAPID_PRIVATE_KEY),totalUsers:available.length,subscribedUsers:subscribed.size,history,users:available.map(u=>({userId:u.id,name:u.name||u.email,email:u.email,role:u.role,hasPush:subscribed.has(u.id),isAffiliate:affiliates.some(a=>a.userId===u.id)||u.role==='affiliate'||!!(u as any).isAffiliate}))});
+    }catch{res.status(503).json({error:'Não foi possível carregar a central. Tente novamente.'});}
   });
-
-  // POST /api/admin/notifications (STRICTLY FOR AFFILIATES ONLY)
-  app.post('/api/admin/notifications', requireAdmin, async (req: AuthRequest, res: Response) => {
-    try {
-      const { title, body, target = 'all_affiliates', targetUserId } = req.body;
-      if (!title || !body) {
-        return res.status(400).json({ error: 'Título e mensagem são obrigatórios.' });
-      }
-
-      // Fetch all users, affiliates, and referrals to strictly isolate the affiliate network
-      const [allUsers, allAffiliates, allReferrals] = await Promise.all([
-        dbService.getAllUsers(),
-        dbService.getAllAffiliates(),
-        dbService.getAllReferrals()
-      ]);
-
-      // Count referrals per affiliate
-      const referralsCountByAffiliateId = new Map<string, number>();
-      for (const ref of allReferrals) {
-        referralsCountByAffiliateId.set(ref.affiliateId, (referralsCountByAffiliateId.get(ref.affiliateId) || 0) + 1);
-      }
-
-      // Build affiliate map: userId -> info
-      const affiliateMap = new Map<string, { user: UserDB; affiliate?: AffiliateDB }>();
-      for (const u of allUsers) {
-        if (u.role === 'affiliate' || (u as any).isInfluencer || (u as any).isAffiliate) {
-          affiliateMap.set(u.id, { user: u });
-        }
-      }
-      for (const a of allAffiliates) {
-        if (a.userId) {
-          const existing = affiliateMap.get(a.userId);
-          if (existing) {
-            existing.affiliate = a;
-          } else {
-            const foundUser = allUsers.find(u => u.id === a.userId);
-            if (foundUser) {
-              affiliateMap.set(a.userId, { user: foundUser, affiliate: a });
-            }
-          }
-        }
-      }
-
-      // Filter eligible affiliates according to target
-      let eligibleAffiliateIds = new Set<string>();
-      let targetLabel = 'Todos os Afiliados';
-
-      if (targetUserId && (affiliateMap.has(targetUserId) || allUsers.some(u => u.id === targetUserId))) {
-        eligibleAffiliateIds.add(targetUserId);
-        const affData = affiliateMap.get(targetUserId);
-        const directUser = allUsers.find(u => u.id === targetUserId);
-        const displayName = affData?.user.name || directUser?.name || directUser?.email || 'Afiliado Selecionado';
-        targetLabel = `Afiliado: ${displayName}`;
-      } else if (target === 'active_affiliates') {
-        targetLabel = 'Afiliados Ativos (com Indicações)';
-        for (const [uid, data] of affiliateMap.entries()) {
-          const affId = data.affiliate?.id;
-          const refCount = affId ? (referralsCountByAffiliateId.get(affId) || 0) : 0;
-          const hasCommissions = (data.affiliate?.commissionTotal || 0) > 0;
-          if (refCount > 0 || hasCommissions) {
-            eligibleAffiliateIds.add(uid);
-          }
-        }
-        // Fallback if no affiliate has indications yet
-        if (eligibleAffiliateIds.size === 0) {
-          eligibleAffiliateIds = new Set(affiliateMap.keys());
-        }
-      } else if (target === 'influencers') {
-        targetLabel = 'Top Influenciadores';
-        for (const [uid, data] of affiliateMap.entries()) {
-          if ((data.user as any).isInfluencer) {
-            eligibleAffiliateIds.add(uid);
-          }
-        }
-        // Fallback if none flagged
-        if (eligibleAffiliateIds.size === 0) {
-          eligibleAffiliateIds = new Set(affiliateMap.keys());
-        }
-      } else {
-        // 'all_affiliates' or default: ALL affiliates and ONLY affiliates
-        targetLabel = 'Todos os Afiliados';
-        eligibleAffiliateIds = new Set(affiliateMap.keys());
-      }
-
-      // STRICT CHECK: Ensure we ONLY send to devices of confirmed affiliates
-      const payload = {
-        title,
-        body,
-        url: '/?tab=affiliates',
-        type: 'SHOW_AFFILIATE_NOTIFICATION'
-      };
-      // Fetch subscriptions for all eligible affiliates in a single optimized query
-      const targetSubscriptions = await dbService.getPushSubscriptions(eligibleAffiliateIds);
-      const payloadStr = JSON.stringify(payload);
-      let sentCount = 0;
-
-      await Promise.all(targetSubscriptions.map(async (data) => {
-        try {
-          await webpush.sendNotification(data.subscription as webpush.PushSubscription, payloadStr, {
-            TTL: 86400,
-            urgency: 'high',
-          });
-          sentCount++;
-        } catch (err: any) {
-          console.warn(`[WebPush] Push error for ${data.endpoint?.substring(0, 35)}...:`, err.statusCode || err.message);
-          if (err.statusCode === 410 || err.statusCode === 404) {
-            await dbService.deletePushSubscription(data.id || data.endpoint).catch(console.error);
-          }
-        }
-      }));
-
-      // Log dispatch history
-      const logEntry: AdminAffiliateNotificationLog = {
-        id: `notif_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-        title,
-        body,
-        target: target || 'all_affiliates',
-        targetLabel,
-        sentCount,
-        totalEligibleAffiliates: eligibleAffiliateIds.size,
-        createdAt: new Date().toISOString(),
-        sentBy: req.user?.name || req.user?.email || 'Administrador'
-      };
-      adminAffiliateNotificationLogs.unshift(logEntry);
-      if (adminAffiliateNotificationLogs.length > 50) {
-        adminAffiliateNotificationLogs.pop();
-      }
-
-      // Persist log and affiliate feed in Supabase
-      await dbService.saveAdminNotificationLog({
-        id: logEntry.id,
-        title: logEntry.title,
-        body: logEntry.body,
-        target: logEntry.target,
-        targetLabel: logEntry.targetLabel,
-        sentCount: logEntry.sentCount,
-        totalEligibleAffiliates: logEntry.totalEligibleAffiliates,
-        createdAt: logEntry.createdAt,
-        sentBy: logEntry.sentBy
-      }).catch(console.error);
-
-      await dbService.saveAffiliateFeedItem({
-        id: `feed_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-        title,
-        body,
-        url: '/?tab=affiliates',
-        target: target || 'all_affiliates',
-        createdAt: new Date().toISOString(),
-        sentBy: req.user?.name || req.user?.email || 'Administrador'
-      }).catch(console.error);
-
-      // Disparo em tempo real para o Webhook do Discord dos Afiliados
-      sendDiscordAffiliateWebhook({
-        title,
-        body,
-        url: '/?tab=affiliates',
-        type: 'Campanha de Afiliados',
-        targetLabel,
-        sentBy: req.user?.name || req.user?.email || 'Administrador'
-      }).catch((err) => console.error('[DiscordWebhook] Erro no envio via admin:', err));
-
-      console.log(`[Admin Push] Notificação disparada com exclusividade para ${eligibleAffiliateIds.size} afiliados (${sentCount} dispositivos notificados via push e espelhado no Webhook Discord).`);
-
-      res.json({
-        success: true,
-        message: `Notificação enviada com sucesso para os Afiliados e espelhada no Discord! (${eligibleAffiliateIds.size} afiliados na base, ${sentCount} push entregues)`,
-        sentCount,
-        totalEligibleAffiliates: eligibleAffiliateIds.size,
-        historyEntry: logEntry
+  app.post('/api/admin/notifications/preview',requireAdmin,async(req:AuthRequest,res:Response)=>{
+    if(!canNotify(req,res))return;
+    try{const {eligible,subscriptions}=await notificationAudience(req.body);res.json({eligibleCount:eligible.length,deviceCount:subscriptions.length,subscribedUsers:new Set(subscriptions.map(s=>s.userId)).size});}
+    catch(err:any){res.status(err.status||503).json({error:err.status?err.message:'Não foi possível consultar o público.'});}
+  });
+  app.post('/api/admin/notifications',requireAdmin,async(req:AuthRequest,res:Response)=>{
+    if(!canNotify(req,res))return;
+    if(!VAPID_PUBLIC_KEY||!VAPID_PRIVATE_KEY)return res.status(503).json({error:'Configure as chaves VAPID do servidor antes de enviar notificações.'});
+    let campaignRef:any;
+    let claimed=false;
+    try{
+      const {config,eligible,subscriptions}=await notificationAudience(req.body);
+      const requestId=req.body.requestId;
+      if(typeof requestId!=='string'||!/^[a-zA-Z0-9-]{16,80}$/.test(requestId))return res.status(400).json({error:'Identificador de envio inválido.'});
+      if(!subscriptions.length)return res.status(422).json({error:'Nenhum dispositivo com permissão de notificações neste público.'});
+      if(subscriptions.length>250)return res.status(422).json({error:'Este envio excede 250 dispositivos. Selecione um público menor.'});
+      campaignRef=supabaseStore.collection('admin_notification_logs').doc(requestId);
+      const guard=supabaseStore.collection('notification_dispatch_guards').doc(req.user!.id);
+      const started=await supabaseStore.transaction(async tx=>{
+        const previous=await tx.get(campaignRef),recent=await tx.get(guard);
+        if(previous.exists()) return {duplicate:true,entry:previous.data()};
+        if(Date.now()-Number(recent.data()?.lastSentAt||0)<60000)throw Object.assign(new Error('Aguarde um minuto entre envios.'),{status:429});
+        const entry={id:requestId,...config,status:'sending',sentCount:0,totalEligibleAffiliates:eligible.length,attemptedCount:subscriptions.length,targetLabel:notificationTargetLabels[config.target],createdAt:new Date().toISOString(),sentBy:req.user!.name||req.user!.email};
+        tx.set(campaignRef,entry);tx.set(guard,{lastSentAt:Date.now()});return {duplicate:false,entry};
       });
-    } catch (err: any) {
-      console.error('Error sending admin push notification to affiliates:', err);
-      res.status(500).json({ error: 'Erro ao enviar notificação para os afiliados.' });
+      if(started.duplicate)return res.status(started.entry.status==='completed'?200:409).json({success:started.entry.status==='completed',message:'Este envio já foi registrado. Consulte o histórico antes de tentar novamente.',historyEntry:started.entry,error:started.entry.status==='completed'?undefined:'Envio já iniciado; não será repetido.'});
+      claimed=true;
+      let sentCount=0,failedCount=0,expiredCount=0;
+      const payload=JSON.stringify({title:config.title,body:config.body,url:config.url,silent:config.silent,icon:'/notification-x.png',badge:'/notification-badge.png',tag:requestId,type:'SHOW_NOTIFICATION'});
+      // Bounded concurrency and finite network timeouts for serverless runtimes.
+      for(let i=0;i<subscriptions.length;i+=10){
+        await Promise.all(subscriptions.slice(i,i+10).map(async item=>{
+          try{await webpush.sendNotification(item.subscription as webpush.PushSubscription,payload,{TTL:config.ttl,urgency:config.urgency as any,timeout:4000});sentCount++;}
+          catch(err:any){if([404,410].includes(err.statusCode)){expiredCount++;await dbService.deletePushSubscription(item.id||item.endpoint).catch(()=>{});}else failedCount++;}
+        }));
+      }
+      const historyEntry={...started.entry,status:'completed',sentCount,failedCount,expiredCount,completedAt:new Date().toISOString()};
+      await campaignRef.set(historyEntry);
+      res.json({success:true,message:`${sentCount} dispositivo(s) aceitaram o envio; ${failedCount} falha(s), ${expiredCount} inscrição(ões) expirada(s).`,historyEntry});
+    }catch(err:any){
+      // A crash after dispatch must never cause an automatic duplicate broadcast.
+      if(claimed&&campaignRef)await campaignRef.update({status:'review_required'}).catch(()=>{});
+      res.status(err.status||503).json({error:err.status?err.message:'Não foi possível concluir. Consulte o histórico antes de reenviar.'});
     }
   });
 
   // POST /api/admin/notifications/test-discord -> Dispara teste instantâneo para o Webhook do Discord de Afiliados
   app.post('/api/admin/notifications/test-discord', requireAdmin, async (req: AuthRequest, res: Response) => {
+    if(!canNotify(req,res))return;
     try {
       const { title, body } = req.body || {};
       const success = await sendDiscordAffiliateWebhook({
