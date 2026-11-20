@@ -97,7 +97,7 @@ export const AdminDepositsTab: React.FC<AdminDepositsTabProps> = ({
           value={`R$ ${totalVolume.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           subtitle={`${approvedList.length} pagamentos aprovados`}
           icon={TrendingUp}
-          iconBgColor="bg-[#34C759]"
+          iconBgColor="bg-[#657466]"
           isPositive={true}
         />
 
@@ -106,7 +106,7 @@ export const AdminDepositsTab: React.FC<AdminDepositsTabProps> = ({
           value={`R$ ${avgTicket.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           subtitle="Valor médio por depósito PIX"
           icon={CreditCard}
-          iconBgColor="bg-[#007AFF]"
+          iconBgColor="bg-[#596777]"
         />
 
         <IOSStatCard
@@ -114,7 +114,7 @@ export const AdminDepositsTab: React.FC<AdminDepositsTabProps> = ({
           value={`R$ ${withSponsorVolume.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           subtitle={`${totalVolume > 0 ? ((withSponsorVolume / totalVolume) * 100).toFixed(0) : 0}% vindo de afiliados`}
           icon={Users}
-          iconBgColor="bg-[#AF52DE]"
+          iconBgColor="bg-[#737080]"
         />
 
         <IOSStatCard
@@ -122,7 +122,7 @@ export const AdminDepositsTab: React.FC<AdminDepositsTabProps> = ({
           value={`R$ ${organicVolume.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           subtitle={`${totalVolume > 0 ? ((organicVolume / totalVolume) * 100).toFixed(0) : 0}% sem patrocinador`}
           icon={Globe}
-          iconBgColor="bg-[#5856D6]"
+          iconBgColor="bg-[#697587]"
         />
       </div>
 
@@ -204,7 +204,7 @@ export const AdminDepositsTab: React.FC<AdminDepositsTabProps> = ({
                       </td>
 
                       {/* Amount */}
-                      <td className="py-3.5 px-4 text-right font-mono font-bold text-sm text-[#34C759] whitespace-nowrap">
+                      <td className="py-3.5 px-4 text-right font-mono font-bold text-sm text-[#657466] whitespace-nowrap">
                         +R$ {item.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
 

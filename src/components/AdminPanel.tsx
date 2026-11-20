@@ -1,3 +1,6 @@
+import {useWorkspaceMobile} from '../lib/useWorkspaceMobile';
+import '../styles/workspace-refined.css';
+import '../styles/workspace-mobile.css';
 import { readApiJson } from '../lib/readApiJson';
 import { AdminGateways } from './admin/AdminGateways';
 import {AdminAffiliateManagement} from './admin/AdminAffiliateManagement';
@@ -144,6 +147,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 }) => {
   const isSuperAdmin = currentUser?.role === 'superadmin';
   const gameRequestPending = useRef(false);
+  useEffect(()=>{document.body.classList.add('inex-admin-open');return()=>document.body.classList.remove('inex-admin-open');},[]);
   const canRead = (...permissions: (keyof AdminPermissions)[]) => currentUser?.role === 'superadmin' || permissions.some(permission => !!currentUser?.adminPermissions?.[permission]);
   const readAdminResponse = async (res: Response) => {
     const data = await readApiJson(res).catch(() => ({}));
@@ -164,6 +168,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   useEffect(()=>{mountedAdmin.current=true;return()=>{mountedAdmin.current=false;};},[]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [globalSearchQuery, setGlobalSearchQuery] = useState('');
+  useWorkspaceMobile('admin',activeTab);
   const selectAdminTab = (tab: AdminTabId) => { setActiveTab(tab); setGlobalSearchQuery(''); }; 
   const [migrationModalOpen, setMigrationModalOpen] = useState(false);
 

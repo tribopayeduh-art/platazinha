@@ -82,7 +82,7 @@ export const IOSSegmentedControl = <T extends string>({
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            {Icon && <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-[#007AFF]' : 'text-slate-400'}`} />}
+            {Icon && <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-[#596777]' : 'text-slate-400'}`} />}
             <span>{opt.label}</span>
             {opt.count !== undefined && (
               <span
@@ -127,12 +127,12 @@ export const IOSBadge: React.FC<{
   className?: string;
 }> = ({ children, variant = 'gray', className = '' }) => {
   const styles = {
-    green: 'bg-[#34C759]/12 text-[#248A3D] border-[#34C759]/20',
-    blue: 'bg-[#007AFF]/12 text-[#0062CC] border-[#007AFF]/20',
-    orange: 'bg-[#FF9500]/12 text-[#B36B00] border-[#FF9500]/20',
-    red: 'bg-[#FF3B30]/12 text-[#D70015] border-[#FF3B30]/20',
-    purple: 'bg-[#AF52DE]/12 text-[#8944AB] border-[#AF52DE]/20',
-    indigo: 'bg-[#5856D6]/12 text-[#3634A3] border-[#5856D6]/20',
+    green: 'bg-[#657466]/12 text-[#59685d] border-[#657466]/20',
+    blue: 'bg-[#596777]/12 text-[#596777] border-[#596777]/20',
+    orange: 'bg-[#7c7469]/12 text-[#756b5b] border-[#7c7469]/20',
+    red: 'bg-[#986a70]/12 text-[#986a70] border-[#986a70]/20',
+    purple: 'bg-[#737080]/12 text-[#737080] border-[#737080]/20',
+    indigo: 'bg-[#697587]/12 text-[#697587] border-[#697587]/20',
     gray: 'bg-black/[0.06] text-slate-600 border-black/[0.06]'
   };
 
@@ -166,7 +166,7 @@ export const IOSStatCard: React.FC<{
   change,
   isPositive,
   icon: Icon,
-  iconBgColor = 'bg-[#007AFF]',
+  iconBgColor = 'bg-[#596777]',
   iconColor = 'text-white',
   sparkline,
   onClick,
@@ -189,7 +189,7 @@ export const IOSStatCard: React.FC<{
         {change && (
           <span
             className={`font-semibold shrink-0 px-2 py-0.5 rounded-full text-[10px] ${
-              isPositive ? 'bg-[#34C759]/12 text-[#248A3D]' : 'bg-[#FF3B30]/12 text-[#D70015]'
+              isPositive ? 'bg-[#657466]/12 text-[#59685d]' : 'bg-[#986a70]/12 text-[#986a70]'
             }`}
           >
             {change}
@@ -231,10 +231,10 @@ export const IOSButton: React.FC<{
   };
 
   const variantStyles = {
-    primary: 'bg-[#007AFF] hover:bg-[#0062CC] text-white shadow-sm active:scale-[0.98]',
+    primary: 'bg-[#596777] hover:bg-[#596777] text-white shadow-sm active:scale-[0.98]',
     secondary: 'bg-[#E5E5EA] hover:bg-[#D1D1D6] text-slate-800 active:scale-[0.98]',
-    destructive: 'bg-[#FF3B30] hover:bg-[#D70015] text-white shadow-sm active:scale-[0.98]',
-    success: 'bg-[#34C759] hover:bg-[#28A745] text-white shadow-sm active:scale-[0.98]',
+    destructive: 'bg-[#986a70] hover:bg-[#986a70] text-white shadow-sm active:scale-[0.98]',
+    success: 'bg-[#657466] hover:bg-[#28A745] text-white shadow-sm active:scale-[0.98]',
     ghost: 'bg-transparent hover:bg-black/[0.05] text-slate-700 active:scale-[0.98]'
   };
 
@@ -271,7 +271,7 @@ export const IOSSearchBar: React.FC<{
         onChange={(e) => onChange(e.target.value)}
         aria-label={placeholder}
         placeholder={placeholder}
-        className="w-full h-9 pl-9 pr-8 bg-[#767680]/12 hover:bg-[#767680]/16 focus:bg-white text-slate-900 placeholder-[#8E8E93] text-xs font-medium rounded-xl border border-transparent focus:border-[#007AFF] focus:outline-none transition-all"
+        className="w-full h-9 pl-9 pr-8 bg-[#767680]/12 hover:bg-[#767680]/16 focus:bg-white text-slate-900 placeholder-[#8E8E93] text-xs font-medium rounded-xl border border-transparent focus:border-[#596777] focus:outline-none transition-all"
       />
       {value && (
         <button

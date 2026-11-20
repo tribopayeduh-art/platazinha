@@ -64,8 +64,8 @@ export const AdminAffiliateNetworkModal: React.FC<AdminAffiliateNetworkModalProp
             </span>
           </div>
 
-          <div className="p-3 bg-[#34C759]/10 rounded-xl space-y-0.5">
-            <span className="text-[10px] font-bold text-[#248A3D] uppercase tracking-wider block">
+          <div className="p-3 bg-[#657466]/10 rounded-xl space-y-0.5">
+            <span className="text-[10px] font-bold text-[#59685d] uppercase tracking-wider block">
               Depósitos da Rede
             </span>
             <span className="text-base font-bold text-slate-900 font-mono block">
@@ -73,8 +73,8 @@ export const AdminAffiliateNetworkModal: React.FC<AdminAffiliateNetworkModalProp
             </span>
           </div>
 
-          <div className="p-3 bg-[#AF52DE]/10 rounded-xl space-y-0.5">
-            <span className="text-[10px] font-bold text-[#8944AB] uppercase tracking-wider block">
+          <div className="p-3 bg-[#737080]/10 rounded-xl space-y-0.5">
+            <span className="text-[10px] font-bold text-[#737080] uppercase tracking-wider block">
               Comissão Depósitos
             </span>
             <span className="text-base font-bold text-slate-900 font-mono block">
@@ -82,9 +82,9 @@ export const AdminAffiliateNetworkModal: React.FC<AdminAffiliateNetworkModalProp
             </span>
           </div>
 
-          <div className="p-3 bg-[#007AFF]/10 rounded-xl space-y-0.5">
+          <div className="p-3 bg-[#596777]/10 rounded-xl space-y-0.5">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-[#0062CC] uppercase tracking-wider block">
+              <span className="text-[10px] font-bold text-[#596777] uppercase tracking-wider block">
                 Saldo da Carteira
               </span>
               <button
@@ -93,7 +93,7 @@ export const AdminAffiliateNetworkModal: React.FC<AdminAffiliateNetworkModalProp
                   onClose();
                   onOpenBalanceModal(affiliate, 'affiliate');
                 }}
-                className="text-[10px] font-bold text-[#007AFF] hover:underline cursor-pointer"
+                className="text-[10px] font-bold text-[#596777] hover:underline cursor-pointer"
                 title="Clique para ajustar o saldo desta carteira de afiliado"
               >
                 Ajustar
@@ -132,7 +132,7 @@ export const AdminAffiliateNetworkModal: React.FC<AdminAffiliateNetworkModalProp
                     <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
                       R$ {player.balance.toFixed(2)}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-semibold text-[#34C759]">
+                    <td className="py-2.5 px-3 text-right font-mono font-semibold text-[#657466]">
                       R$ {(player.totalDeposited || 0).toFixed(2)}
                     </td>
                     <td className="py-2.5 px-3 text-center">

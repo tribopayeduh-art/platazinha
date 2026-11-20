@@ -1,7 +1,9 @@
-iNEX — Central de notificações do admin
+iNEX — Admin e parceiros: versão mobile
 
 Esta versão está preparada para o repositório tribopayeduh-art/platazinha.
-Consulte NOTIFICACOES-ADMIN.md para recursos, regras e configuração.
+Consulte MOBILE-PAINEIS.md para os ajustes móveis.
+O visual geral está documentado em DESIGN-ADMIN-PARCEIROS.md.
+A central de notificações continua documentada em NOTIFICACOES-ADMIN.md.
 
 1. Extraia o ZIP em uma pasta permanente.
 2. Substitua os arquivos da pasta do repositório por estes arquivos.

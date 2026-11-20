@@ -144,7 +144,7 @@ export const AdminBalanceModal: React.FC<AdminBalanceModalProps> = ({
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-slate-700">Carteira</label>
             {user.affiliateInfo ? (
-              <span className="text-[10px] font-bold text-[#AF52DE] bg-[#AF52DE]/10 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold text-[#737080] bg-[#737080]/10 px-2 py-0.5 rounded-full">
                 Afiliado Ativo
               </span>
             ) : (
@@ -167,12 +167,12 @@ export const AdminBalanceModal: React.FC<AdminBalanceModalProps> = ({
         {/* Current Balance Display Card */}
         <div className={`p-3.5 rounded-2xl border flex items-center justify-between transition-colors ${
           targetWallet === 'affiliate'
-            ? 'bg-[#AF52DE]/8 border-[#AF52DE]/20 text-slate-900'
-            : 'bg-[#007AFF]/8 border-[#007AFF]/15 text-slate-900'
+            ? 'bg-[#737080]/8 border-[#737080]/20 text-slate-900'
+            : 'bg-[#596777]/8 border-[#596777]/15 text-slate-900'
         }`}>
           <div className="flex items-center gap-2.5">
             <div className={`w-9 h-9 rounded-xl text-white flex items-center justify-center font-bold shadow-xs ${
-              targetWallet === 'affiliate' ? 'bg-[#AF52DE]' : 'bg-[#007AFF]'
+              targetWallet === 'affiliate' ? 'bg-[#737080]' : 'bg-[#596777]'
             }`}>
               <Wallet className="w-4 h-4" />
             </div>
@@ -192,9 +192,9 @@ export const AdminBalanceModal: React.FC<AdminBalanceModalProps> = ({
             </span>
             <span className={`text-sm font-extrabold font-mono ${
               projectedBalance > currentWalletBalance
-                ? 'text-[#34C759]'
+                ? 'text-[#657466]'
                 : projectedBalance < currentWalletBalance
-                ? 'text-[#FF3B30]'
+                ? 'text-[#986a70]'
                 : 'text-slate-600'
             }`}>
               R$ {projectedBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -234,7 +234,7 @@ export const AdminBalanceModal: React.FC<AdminBalanceModalProps> = ({
                   setActionType('set');
                   setAmount('0');
                 }}
-                className="px-2 py-0.5 text-[10px] font-bold bg-[#FF3B30]/10 hover:bg-[#FF3B30]/20 text-[#FF3B30] rounded-md transition-colors cursor-pointer"
+                className="px-2 py-0.5 text-[10px] font-bold bg-[#986a70]/10 hover:bg-[#986a70]/20 text-[#986a70] rounded-md transition-colors cursor-pointer"
                 title="Zerar saldo selecionado"
               >
                 Zerar
@@ -250,7 +250,7 @@ export const AdminBalanceModal: React.FC<AdminBalanceModalProps> = ({
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0,00"
-              className="w-full h-10 pl-9 pr-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs font-bold rounded-xl border border-transparent focus:border-[#007AFF] focus:outline-none transition-all"
+              className="w-full h-10 pl-9 pr-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs font-bold rounded-xl border border-transparent focus:border-[#596777] focus:outline-none transition-all"
             />
           </div>
         </div>
@@ -263,7 +263,7 @@ export const AdminBalanceModal: React.FC<AdminBalanceModalProps> = ({
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder={targetWallet === 'affiliate' ? "Ex: Bonificação de comissões / Ajuste de rede" : "Ex: Bonificação de boas-vindas / Suporte"}
-            className="w-full h-10 px-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs rounded-xl border border-transparent focus:border-[#007AFF] focus:outline-none transition-all"
+            className="w-full h-10 px-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs rounded-xl border border-transparent focus:border-[#596777] focus:outline-none transition-all"
           />
         </div>
 
@@ -286,7 +286,7 @@ export const AdminBalanceModal: React.FC<AdminBalanceModalProps> = ({
             step="0.01"
             value={minWithdraw}
             onChange={(e) => setMinWithdraw(e.target.value)}
-            className="w-full h-10 px-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs font-bold rounded-xl border border-transparent focus:border-[#007AFF] focus:outline-none transition-all"
+            className="w-full h-10 px-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs font-bold rounded-xl border border-transparent focus:border-[#596777] focus:outline-none transition-all"
           />
         </div>
 
@@ -294,7 +294,7 @@ export const AdminBalanceModal: React.FC<AdminBalanceModalProps> = ({
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-slate-700">Taxa de Saque Fixa (R$)</label>
-            <span className="text-[10px] font-bold text-[#007AFF] bg-[#007AFF]/10 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold text-[#596777] bg-[#596777]/10 px-2 py-0.5 rounded-full">
               Cobrada no PIX
             </span>
           </div>
@@ -305,7 +305,7 @@ export const AdminBalanceModal: React.FC<AdminBalanceModalProps> = ({
             value={withdrawFee}
             onChange={(e) => setWithdrawFee(e.target.value)}
             placeholder="8.00"
-            className="w-full h-10 px-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs font-bold rounded-xl border border-transparent focus:border-[#007AFF] focus:outline-none transition-all"
+            className="w-full h-10 px-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs font-bold rounded-xl border border-transparent focus:border-[#596777] focus:outline-none transition-all"
           />
           <div className="flex items-center gap-1.5 pt-0.5">
             <span className="text-[10px] font-medium text-slate-400">Atalhos:</span>
@@ -321,7 +321,7 @@ export const AdminBalanceModal: React.FC<AdminBalanceModalProps> = ({
                 onClick={() => setWithdrawFee(p.val)}
                 className={`px-2 py-0.5 text-[10px] font-bold rounded-lg cursor-pointer transition-all ${
                   withdrawFee === p.val
-                    ? 'bg-[#007AFF] text-white shadow-xs'
+                    ? 'bg-[#596777] text-white shadow-xs'
                     : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                 }`}
               >

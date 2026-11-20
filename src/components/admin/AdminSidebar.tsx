@@ -24,6 +24,7 @@ export const AdminSidebar: React.FC<Props> = ({activeTab,onSelectTab,mobileMenuO
     document.addEventListener('keydown',key);
     return ()=>{document.removeEventListener('keydown',key);previous?.focus();};
   },[mobileMenuOpen]);
+  useEffect(()=>{const wide=window.matchMedia('(min-width:768px)');const change=()=>{if(wide.matches)closeRef.current();};wide.addEventListener('change',change);return()=>wide.removeEventListener('change',change);},[]);
   const groups=[
     {title:'Operação',items:[{id:'metrics',label:'Visão geral',icon:BarChart3},{id:'live',label:'Jogadores ao vivo',icon:Radio},{id:'users',label:'Usuários',icon:Users},...(adminRole==='superadmin'||adminPermissions?.canManageUsers?[{id:'affiliates',label:'Gestão de afiliados',icon:Users}]:[]),{id:'games',label:'Jogos',icon:Gamepad2}]},
     {title:'Financeiro',items:[...(adminRole==='superadmin'||adminPermissions?.canManageCommissions||adminPermissions?.canViewMetrics?[{id:'commissions',label:'Comissões',icon:Wallet}]:[]),...(adminRole==='superadmin'||adminPermissions?.canManageDotfy?[{id:'dotfy',label:'Gateway',icon:Wallet}]:[]),{id:'deposits',label:'Depósitos',icon:CreditCard},{id:'withdrawals',label:'Saques',icon:ArrowUpRight},{id:'reports',label:'Relatórios',icon:FileText}]},

@@ -139,7 +139,7 @@ export const AdminAffiliateCommissionModal: React.FC<AdminAffiliateCommissionMod
               max="100"
               value={revSharePercent}
               onChange={(e) => setRevSharePercent(e.target.value)}
-              className="w-full h-10 px-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs font-bold rounded-xl border border-transparent focus:border-[#007AFF] focus:outline-none transition-all"
+              className="w-full h-10 px-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs font-bold rounded-xl border border-transparent focus:border-[#596777] focus:outline-none transition-all"
             />
             <span className="absolute right-3 top-2.5 text-xs font-bold text-slate-400">%</span>
           </div>
@@ -158,7 +158,7 @@ export const AdminAffiliateCommissionModal: React.FC<AdminAffiliateCommissionMod
               step="0.01"
               value={cpaAmount}
               onChange={(e) => setCpaAmount(e.target.value)}
-              className="w-full h-10 pl-9 pr-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs font-bold rounded-xl border border-transparent focus:border-[#007AFF] focus:outline-none transition-all"
+              className="w-full h-10 pl-9 pr-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs font-bold rounded-xl border border-transparent focus:border-[#596777] focus:outline-none transition-all"
             />
           </div>
           <p className="text-[11px] text-slate-400">
@@ -189,7 +189,7 @@ export const AdminAffiliateCommissionModal: React.FC<AdminAffiliateCommissionMod
               step="1"
               value={partnerCommissionPercent}
               onChange={(e) => setPartnerCommissionPercent(e.target.value)}
-              className="w-full h-10 px-3 bg-white text-slate-900 text-xs font-bold rounded-xl border border-blue-200 focus:border-[#007AFF] focus:outline-none transition-all"
+              className="w-full h-10 px-3 bg-white text-slate-900 text-xs font-bold rounded-xl border border-blue-200 focus:border-[#596777] focus:outline-none transition-all"
             />
             <span className="absolute right-3 top-2.5 text-xs font-bold text-slate-400">%</span>
           </div>
@@ -202,7 +202,7 @@ export const AdminAffiliateCommissionModal: React.FC<AdminAffiliateCommissionMod
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-slate-700">Taxa de Saque do Afiliado (R$)</label>
-            <span className="text-[10px] font-bold text-[#007AFF] bg-[#007AFF]/10 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold text-[#596777] bg-[#596777]/10 px-2 py-0.5 rounded-full">
               Taxa Fixa PIX
             </span>
           </div>
@@ -215,7 +215,7 @@ export const AdminAffiliateCommissionModal: React.FC<AdminAffiliateCommissionMod
               value={withdrawFee}
               onChange={(e) => setWithdrawFee(e.target.value)}
               placeholder="0.00"
-              className="w-full h-10 pl-9 pr-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs font-bold rounded-xl border border-transparent focus:border-[#007AFF] focus:outline-none transition-all"
+              className="w-full h-10 pl-9 pr-3 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs font-bold rounded-xl border border-transparent focus:border-[#596777] focus:outline-none transition-all"
             />
           </div>
           <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
@@ -232,7 +232,7 @@ export const AdminAffiliateCommissionModal: React.FC<AdminAffiliateCommissionMod
                 onClick={() => setWithdrawFee(preset.val)}
                 className={`px-2 py-0.5 text-[10px] font-bold rounded-lg transition-all cursor-pointer ${
                   withdrawFee === preset.val
-                    ? 'bg-[#007AFF] text-white shadow-xs'
+                    ? 'bg-[#596777] text-white shadow-xs'
                     : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                 }`}
               >
@@ -248,7 +248,7 @@ export const AdminAffiliateCommissionModal: React.FC<AdminAffiliateCommissionMod
         {/* Financial Withdrawal Operations Controls */}
         <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-3.5">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#007AFF]/15 flex items-center justify-center text-[#007AFF]">
+            <div className="w-7 h-7 rounded-lg bg-[#596777]/15 flex items-center justify-center text-[#596777]">
               <Zap className="w-4 h-4 fill-current" />
             </div>
             <div>
@@ -458,10 +458,10 @@ export const AdminAffiliateCommissionModal: React.FC<AdminAffiliateCommissionMod
         <div className="pt-3 border-t border-black/[0.06] space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <Wallet className="w-4 h-4 text-[#AF52DE]" />
+              <Wallet className="w-4 h-4 text-[#737080]" />
               <label className="text-xs font-bold text-slate-800">Saldo da Carteira de Afiliado</label>
             </div>
-            <span className="text-xs font-mono font-bold text-[#AF52DE]">
+            <span className="text-xs font-mono font-bold text-[#737080]">
               Atual: R$ {currentAffBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
@@ -478,7 +478,7 @@ export const AdminAffiliateCommissionModal: React.FC<AdminAffiliateCommissionMod
           />
 
           {balanceAction !== 'keep' && (
-            <div className="p-3 bg-[#AF52DE]/6 border border-[#AF52DE]/15 rounded-xl space-y-2">
+            <div className="p-3 bg-[#737080]/6 border border-[#737080]/15 rounded-xl space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-semibold text-slate-600">
                   Valor a {balanceAction === 'set' ? 'definir como novo saldo' : balanceAction === 'add' ? 'adicionar à carteira' : 'debitar da carteira'}:
@@ -515,13 +515,13 @@ export const AdminAffiliateCommissionModal: React.FC<AdminAffiliateCommissionMod
                   value={balanceAmount}
                   onChange={(e) => setBalanceAmount(e.target.value)}
                   placeholder="0,00"
-                  className="w-full h-9 pl-9 pr-3 bg-white text-slate-900 text-xs font-bold rounded-lg border border-black/[0.08] focus:border-[#AF52DE] focus:outline-none transition-all"
+                  className="w-full h-9 pl-9 pr-3 bg-white text-slate-900 text-xs font-bold rounded-lg border border-black/[0.08] focus:border-[#737080] focus:outline-none transition-all"
                 />
               </div>
 
               <div className="flex items-center justify-between text-[11px] font-medium text-slate-600 pt-0.5">
                 <span>Saldo projetado:</span>
-                <span className="font-mono font-bold text-[#AF52DE]">
+                <span className="font-mono font-bold text-[#737080]">
                   R$ {projectedAffBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>

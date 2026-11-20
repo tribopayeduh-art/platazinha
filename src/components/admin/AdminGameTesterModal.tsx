@@ -33,7 +33,7 @@ export const AdminGameTesterModal: React.FC<AdminGameTesterModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-4 bg-[#2C2C2E] border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#007AFF] flex items-center justify-center text-white font-bold shadow-sm">
+            <div className="w-10 h-10 rounded-2xl bg-[#596777] flex items-center justify-center text-white font-bold shadow-sm">
               <Gamepad2 className="w-5 h-5" />
             </div>
             <div>
@@ -63,7 +63,7 @@ export const AdminGameTesterModal: React.FC<AdminGameTesterModalProps> = ({
               href={modal.gameUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="h-8 px-3 rounded-xl bg-[#007AFF] hover:bg-[#0A84FF] text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+              className="h-8 px-3 rounded-xl bg-[#596777] hover:bg-[#0A84FF] text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Nova Aba</span>

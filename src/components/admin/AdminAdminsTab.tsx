@@ -125,7 +125,7 @@ export const AdminAdminsTab: React.FC<AdminAdminsTabProps> = ({
                   <tr key={admin.id} className="hover:bg-black/[0.015] transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-[#007AFF]/12 text-[#007AFF] font-bold text-xs flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-[#596777]/12 text-[#596777] font-bold text-xs flex items-center justify-center">
                           {admin.name ? admin.name.charAt(0).toUpperCase() : 'A'}
                         </div>
                         <div>
@@ -146,7 +146,7 @@ export const AdminAdminsTab: React.FC<AdminAdminsTabProps> = ({
                     <td className="py-3.5 px-4">
                       <div className="flex flex-wrap gap-1 max-w-sm">
                         {isSuper ? (
-                          <span className="text-[10px] font-bold text-[#007AFF]">
+                          <span className="text-[10px] font-bold text-[#596777]">
                             Acesso Irrestrito / Full Master
                           </span>
                         ) : (
@@ -180,7 +180,7 @@ export const AdminAdminsTab: React.FC<AdminAdminsTabProps> = ({
                         <button
                           type="button"
                           onClick={() => onRemoveAdmin(admin.id)}
-                          className="w-7 h-7 rounded-lg bg-[#FF3B30]/12 text-[#FF3B30] hover:bg-[#FF3B30]/20 flex items-center justify-center transition-all cursor-pointer mx-auto"
+                          className="w-7 h-7 rounded-lg bg-[#986a70]/12 text-[#986a70] hover:bg-[#986a70]/20 flex items-center justify-center transition-all cursor-pointer mx-auto"
                           title="Remover operador"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -210,7 +210,7 @@ export const AdminAdminsTab: React.FC<AdminAdminsTabProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ex: Carlos Oliveira"
-              className="w-full h-10 px-3.5 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs rounded-xl border border-transparent focus:border-[#007AFF] focus:outline-none transition-all"
+              className="w-full h-10 px-3.5 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs rounded-xl border border-transparent focus:border-[#596777] focus:outline-none transition-all"
               required
             />
           </div>
@@ -222,7 +222,7 @@ export const AdminAdminsTab: React.FC<AdminAdminsTabProps> = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="operador@alliance.com"
-              className="w-full h-10 px-3.5 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs rounded-xl border border-transparent focus:border-[#007AFF] focus:outline-none transition-all"
+              className="w-full h-10 px-3.5 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs rounded-xl border border-transparent focus:border-[#596777] focus:outline-none transition-all"
               required
             />
           </div>
@@ -234,7 +234,7 @@ export const AdminAdminsTab: React.FC<AdminAdminsTabProps> = ({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full h-10 px-3.5 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs rounded-xl border border-transparent focus:border-[#007AFF] focus:outline-none transition-all"
+              className="w-full h-10 px-3.5 bg-[#767680]/10 focus:bg-white text-slate-900 text-xs rounded-xl border border-transparent focus:border-[#596777] focus:outline-none transition-all"
               required
             />
           </div>

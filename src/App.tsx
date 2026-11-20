@@ -1090,7 +1090,7 @@ function AppContent({onGameModeChange}:{onGameModeChange:(value:boolean)=>void})
         </main>
 
         {/* Bottom Navigation */}
-        {!gameVisible && <BottomNavigation
+        {!gameVisible && !partnerPanelOpen && subView !== 'partner' && <BottomNavigation
           activeTab={activeTab}
           desktopExpanded={true}
           onChangeTab={(tab) => {

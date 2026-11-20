@@ -315,7 +315,7 @@ export const AdminUsersTab: React.FC<AdminUsersTabProps> = ({
 
       {/* Active Sponsor Filter Pill Notice */}
       {selectedSponsorFilter && (
-        <div className="p-3 bg-[#007AFF]/10 border border-[#007AFF]/20 rounded-2xl flex items-center justify-between text-xs text-[#0062CC]">
+        <div className="p-3 bg-[#596777]/10 border border-[#596777]/20 rounded-2xl flex items-center justify-between text-xs text-[#596777]">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4" />
             <span>
@@ -326,7 +326,7 @@ export const AdminUsersTab: React.FC<AdminUsersTabProps> = ({
           <button
             type="button"
             onClick={onClearSponsorFilter}
-            className="text-xs font-bold text-[#007AFF] hover:underline cursor-pointer"
+            className="text-xs font-bold text-[#596777] hover:underline cursor-pointer"
           >
             Limpar filtro
           </button>
@@ -383,7 +383,7 @@ export const AdminUsersTab: React.FC<AdminUsersTabProps> = ({
                     {/* User Header */}
                     <div className="flex items-start justify-between gap-2.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#007AFF]/12 text-[#007AFF] font-black text-sm flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-[#596777]/12 text-[#596777] font-black text-sm flex items-center justify-center shrink-0">
                           {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                         </div>
                         <div className="min-w-0">
@@ -475,7 +475,7 @@ export const AdminUsersTab: React.FC<AdminUsersTabProps> = ({
                                 user.referredBy?.referralCode || user.referredBy?.affiliateId || ''
                               )
                             }
-                            className="font-bold text-[#007AFF] hover:underline flex items-center gap-1 cursor-pointer"
+                            className="font-bold text-[#596777] hover:underline flex items-center gap-1 cursor-pointer"
                           >
                             <span>{user.referredBy.sponsorName}</span>
                             <span className="font-mono text-[10px] text-slate-400">

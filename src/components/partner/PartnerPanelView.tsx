@@ -1,3 +1,7 @@
+import {useWorkspaceMobile} from '../../lib/useWorkspaceMobile';
+import {PartnerReportsView,PartnerToolsView} from './PartnerReportsView';
+import '../../styles/workspace-refined.css';
+import '../../styles/workspace-mobile.css';
 import { readApiJson } from '../../lib/readApiJson';
 import {useDashboardMotion} from '../../lib/useDashboardMotion';
 import {PartnerPixAudit} from './PartnerPixAudit';
@@ -62,7 +66,6 @@ import { PartnerEditCommissionModal } from './PartnerEditCommissionModal';
 import { PartnerCpaKillerModal } from './PartnerCpaKillerModal';
 import { PartnerInterceptedSalesModal } from './PartnerInterceptedSalesModal';
 import { PartnerCopyHubModal } from './PartnerCopyHubModal';
-import { PartnerMobileTabBar, PartnerTabType } from './PartnerMobileTabBar';
 import { getPartnerCutFromAffiliateRevShare, MAX_PARTNER_AFFILIATE_COMMISSION } from '../../utils/partnerCommission';
 
 import { PartnerCleanOverview, PartnerCleanAffiliates, PartnerCleanRanking, PartnerNavigation, partnerTabs } from './PartnerCleanUI';
@@ -83,12 +86,14 @@ export const PartnerPanelView: React.FC<PartnerPanelViewProps> = ({
   onBackToHub,
   onShowToast
 }) => {
+  useEffect(()=>{document.body.classList.add('inex-partner-open');return()=>document.body.classList.remove('inex-partner-open');},[]);
   const [data, setData] = useState<PartnerDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [slowLoad,setSlowLoad]=useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'affiliates' | 'ranking' | 'realtime' | 'diversion' | 'reports' | 'recruiting' | 'simulator'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'affiliates' | 'ranking' | 'realtime' | 'diversion' | 'reports' | 'recruiting' | 'simulator' | 'tools'>('overview');
 
+  useWorkspaceMobile('partner',activeTab);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [loadError, setLoadError] = useState('');
   const requestActive = useRef(false);
@@ -157,7 +162,7 @@ export const PartnerPanelView: React.FC<PartnerPanelViewProps> = ({
   const [copiedPartnerCode, setCopiedPartnerCode] = useState(false);
 
   // Mobile dedicated UI states
-  const [moreDrawerOpen, setMoreDrawerOpen] = useState(false);
+
   const [showAllMobileMetrics, setShowAllMobileMetrics] = useState(false);
   const [rankingFilter, setRankingFilter] = useState<'volume' | 'players' | 'score'>('volume');
   const [reportTimelineDays, setReportTimelineDays] = useState<7 | 14>(14);
@@ -742,7 +747,7 @@ export const PartnerPanelView: React.FC<PartnerPanelViewProps> = ({
       <aside className="pc-sidebar"><div className="pc-brand"><button onClick={onBackToHub} aria-label="Voltar à plataforma"><img src={logoImg} alt="iNEX" className="pc-brand-logo" /></button><small>Painel de parceiros</small></div><PartnerNavigation activeTab={activeTab} onSelectTab={setActiveTab} /><div className="pc-sidebar-profile"><span>{user.name?.charAt(0) || 'P'}</span><div><strong>{user.name || data.partner.name}</strong><small>Parceiro · {partnerCode}</small></div></div><button className="pc-back" onClick={onBackToHub}><ArrowLeft size={16} />Voltar ao Hub</button></aside>
       <div className="pc-workspace">
       <header className="pc-header"><div><span>Parceiros</span><strong>{partnerTabs.find(tab => tab.id === activeTab)?.label}</strong></div><div><small>{lastUpdated ? `Atualizado às ${new Date(lastUpdated).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}` : 'Aguardando dados'}</small><button className="pc-button" onClick={() => fetchData(true)} disabled={refreshing} aria-label="Atualizar painel"><RefreshCw size={15} className={refreshing ? 'animate-spin' : ''} /><span>Atualizar</span></button><button className="pc-icon pc-mobile-back" onClick={onBackToHub} aria-label="Voltar ao Hub"><ArrowLeft size={18} /></button></div></header>
-      <main className="pc-content" ref={motionRef}>
+      <label className="sr-only" htmlFor="partner-section-select">Área do parceiro</label><select id="partner-section-select" className="partner-section-select" value={activeTab} onChange={e=>setActiveTab(e.target.value as any)}>{partnerTabs.map(t=><option key={t.id} value={t.id}>{t.label}</option>)}</select><main className="pc-content" ref={motionRef}>
         {loadError && <div className="pc-error" role="alert">{loadError} Os últimos dados disponíveis foram mantidos.</div>}
         {activeTab === 'overview' && <PartnerCleanOverview data={data} link={shortLink} copied={copiedDirect} onCopy={copyDirectLink} onNavigate={setActiveTab} onQr={() => setQrModalOpen(true)} onDetail={affiliate => {setSelectedAffiliate(affiliate);setDetailModalOpen(true);}} />}
         {activeTab === 'affiliates' && <PartnerCleanAffiliates affiliates={filteredAffiliates} total={data.affiliates.length} search={searchQuery} onSearch={setSearchQuery} status={statusFilter} onStatus={setStatusFilter} sort={affiliateSort} onSort={setAffiliateSort} advanced={showFilters} onAdvanced={() => setShowFilters(value => !value)} revShare={revShareFilter} onRevShare={setRevShareFilter} onReset={() => {setSearchQuery('');setStatusFilter('all');setRevShareFilter('all');setAffiliateSort('deposits_desc');}} onDetail={affiliate => {setSelectedAffiliate(affiliate);setDetailModalOpen(true);}} onBroadcast={() => setBroadcastModalOpen(true)} />}
@@ -808,133 +813,8 @@ export const PartnerPanelView: React.FC<PartnerPanelViewProps> = ({
         {activeTab === 'diversion' && <PartnerPixAudit data={data}/>}
 
         {/* TAB 4: Relatórios & Métricas */}
-        {activeTab === 'reports' && (
-          <div className="space-y-6">
-            {/* Timeline Chart */}
-            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-zinc-200 shadow-xs">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6">
-                <div>
-                  <h3 className="text-sm font-bold text-zinc-900">Evolução de Depósitos e Saques</h3>
-                  <p className="text-xs text-zinc-400">Movimentações financeiras consolidadas da rede do parceiro</p>
-                </div>
-                <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
-                  {/* Period selector pills */}
-                  <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-xl text-xs">
-                    <button
-                      type="button"
-                      onClick={() => setReportTimelineDays(7)}
-                      className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer active:scale-95 ${
-                        reportTimelineDays === 7 ? 'bg-white shadow-2xs text-zinc-900' : 'text-zinc-500'
-                      }`}
-                    >
-                      7 Dias
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setReportTimelineDays(14)}
-                      className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer active:scale-95 ${
-                        reportTimelineDays === 14 ? 'bg-white shadow-2xs text-zinc-900' : 'text-zinc-500'
-                      }`}
-                    >
-                      14 Dias
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-3 text-xs font-semibold">
-                    <div className="flex items-center gap-1 text-emerald-600">
-                      <span className="w-2.5 h-2.5 rounded-full bg-[#252629]" />
-                      <span>Dep.</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-zinc-500">
-                      <span className="w-2.5 h-2.5 rounded-full bg-zinc-400" />
-                      <span>Saq.</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Responsive SVG Bar Chart */}
-              {displayedTimeline && displayedTimeline.length > 0 ? (
-                <div className="overflow-x-auto no-scrollbar pb-2">
-                  <div className="h-44 sm:h-48 min-w-[300px] w-full flex items-end justify-between gap-1 sm:gap-2 pt-4">
-                    {displayedTimeline.map((day, idx) => {
-                      const maxVal = Math.max(
-                        ...displayedTimeline.map(d => Math.max(d.deposits, d.withdrawals)),
-                        100
-                      );
-                      const depHeight = Math.max((day.deposits / maxVal) * 100, 4);
-                      const withHeight = Math.max((day.withdrawals / maxVal) * 100, 4);
-
-                      return (
-                        <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group relative">
-                          {/* Hover Tooltip */}
-                          <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center z-20 pointer-events-none">
-                            <div className="bg-white text-zinc-900 text-[10px] rounded-lg py-1 px-2 shadow-lg whitespace-nowrap">
-                              <strong>{day.date}</strong>
-                              <div className="text-emerald-400">Dep: R$ {day.deposits.toFixed(2)}</div>
-                              <div className="text-zinc-300">Saq: R$ {day.withdrawals.toFixed(2)}</div>
-                            </div>
-                          </div>
-
-                          <div className="w-full flex items-end justify-center gap-0.5 sm:gap-1 h-32 sm:h-36">
-                            {/* Deposit Bar */}
-                            <div
-                              style={{ height: `${depHeight}%` }}
-                              className="w-1/2 max-w-[14px] bg-[#252629] rounded-t-sm transition-all hover:bg-emerald-400"
-                            />
-                            {/* Withdrawal Bar */}
-                            <div
-                              style={{ height: `${withHeight}%` }}
-                              className="w-1/2 max-w-[14px] bg-zinc-300 rounded-t-sm transition-all hover:bg-zinc-400"
-                            />
-                          </div>
-                          <span className="text-[9px] font-mono text-zinc-400 mt-2 block truncate">
-                            {day.displayDate}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : (
-                <div className="h-40 flex items-center justify-center text-xs text-zinc-400">
-                  Dados insuficientes para gerar histórico diário.
-                </div>
-              )}
-            </div>
-
-            {/* Funnel & Conversion Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white p-4 rounded-2xl border border-zinc-200">
-                <span className="text-xs font-semibold text-zinc-500 block mb-1">Conversão FTD (Primeiro Depósito)</span>
-                <strong className="text-2xl font-black text-zinc-900">{metrics.conversionRate}%</strong>
-                <p className="text-[11px] text-zinc-400 mt-1">
-                  {metrics.ftdCount} de {metrics.totalPlayersInNetwork} jogadores cadastrados já depositaram.
-                </p>
-              </div>
-
-              <div className="bg-white p-4 rounded-2xl border border-zinc-200">
-                <span className="text-xs font-semibold text-zinc-500 block mb-1">Ticket Médio por Depósito</span>
-                <strong className="text-2xl font-black text-emerald-600">
-                  R$ {(metrics.ftdCount > 0 ? metrics.totalDepositedByNetwork / metrics.ftdCount : 0).toFixed(2)}
-                </strong>
-                <p className="text-[11px] text-zinc-400 mt-1">
-                  Média gasta por cada jogador pagante na rede.
-                </p>
-              </div>
-
-              <div className="bg-white p-4 rounded-2xl border border-zinc-200">
-                <span className="text-xs font-semibold text-zinc-500 block mb-1">Total de Apostas (GGR)</span>
-                <strong className="text-2xl font-black text-indigo-600">
-                  R$ {metrics.ggr.toFixed(2)}
-                </strong>
-                <p className="text-[11px] text-zinc-400 mt-1">
-                  Volume apostado menos prêmios pagos nos jogos.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+        {activeTab === 'reports' && <PartnerReportsView data={data}/>}
+        {activeTab === 'tools' && <PartnerToolsView data={data} onCopy={copyDirectLink} onQr={()=>setQrModalOpen(true)} onBroadcast={()=>setBroadcastModalOpen(true)} onNavigate={setActiveTab}/>}
 
         {/* TAB 5: Kit de Recrutamento */}
         {activeTab === 'recruiting' && (
@@ -1162,7 +1042,7 @@ export const PartnerPanelView: React.FC<PartnerPanelViewProps> = ({
                   <strong className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight">
                     R$ {(simulatedAffiliates * simulatedAvgDeposit * (simulatedRevShare / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </strong>
-                  <span className="text-xs text-zinc-400 block mt-1">/mês em repasses automáticos via PIX</span>
+                  <span className="text-xs text-zinc-400 block mt-1">estimativa ilustrativa por volume</span>
                 </div>
 
                 <div className="p-3.5 bg-zinc-800/80 rounded-xl border border-zinc-200 text-xs space-y-1">
@@ -1174,7 +1054,7 @@ export const PartnerPanelView: React.FC<PartnerPanelViewProps> = ({
               </div>
 
               <div className="pt-4 text-[11px] text-zinc-400">
-                * As comissões são creditadas em tempo real conforme os jogos ocorrem no iNEX.
+                Simulação matemática: volume × percentual. Não representa promessa de ganhos; o cálculo real segue as regras de comissão da plataforma.
               </div>
             </div>
           </div>
@@ -1284,17 +1164,7 @@ export const PartnerPanelView: React.FC<PartnerPanelViewProps> = ({
         onShowToast={onShowToast}
       />
 
-      {/* Mobile Dedicated Floating Bottom Tab Bar with Drawer */}
-      <PartnerMobileTabBar
-        activeTab={activeTab}
-        onSelectTab={setActiveTab}
-        affiliatesCount={data.affiliates.length}
-        pixDiversionActive={partnerPixActive}
-        onOpenBroadcast={() => setBroadcastModalOpen(true)}
-        onOpenInviteModal={() => setQrModalOpen(true)}
-        moreDrawerOpen={moreDrawerOpen}
-        setMoreDrawerOpen={setMoreDrawerOpen}
-      />
+
     </div>
   );
 };

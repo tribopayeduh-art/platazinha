@@ -1,3 +1,5 @@
+import {WorkspaceFinancialChart} from '../WorkspaceFinancialChart';
+import {downloadReportCsv} from '../../lib/reportExport';
 import {InexLoader} from '../InexLoader';
 import React, { useState } from 'react';
 import {
@@ -68,6 +70,22 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
   ];
 
   const summary = reportData?.periodSummary;
+  const [query,setQuery]=useState('');
+  const [transactionStatus,setTransactionStatus]=useState('all');
+  const [visibleTransactions,setVisibleTransactions]=useState(50);
+  const matches=(row:any)=>!query.trim()||Object.values(row).some(v=>String(v??'').toLocaleLowerCase('pt-BR').includes(query.trim().toLocaleLowerCase('pt-BR')));
+  const transactions=(reportData?.transactions||[]).filter(matches).filter(t=>transactionStatus==='all'||t.status===transactionStatus);
+  const affiliates=(reportData?.affiliateRanking||[]).filter(matches);
+  const players=(reportData?.topProfitablePlayers||[]).filter(matches);
+  const exportCurrent=()=>{
+    if(!reportData)return;
+    let headers:string[],rows:unknown[][];
+    if(subTab==='affiliates'){headers=['Nome','E-mail','Indicações no período','Primeiros depósitos','Depósitos BRL','Comissões BRL'];rows=affiliates.map(a=>[a.userName,a.userEmail,a.periodReferralsCount,a.ftdCount,a.referralDepositsTotal,a.commissionTotal]);}
+    else if(subTab==='players'){headers=['Nome','E-mail','Depósitos BRL','Saques BRL','Apostado BRL','Prêmios BRL','GGR BRL'];rows=players.map(p=>[p.name,p.email,p.totalDeposited,p.totalWithdrawn,p.totalWagered,p.totalPayouts,p.ggrGenerated]);}
+    else if(subTab==='transactions'){headers=['ID','Usuário','E-mail','Tipo','Valor BRL','Status','Data'];rows=transactions.map(t=>[t.id,t.userName,t.userEmail,t.type,t.amount,t.status,t.createdAt]);}
+    else{headers=['Data','Depósitos BRL','Saques BRL','Fluxo de caixa BRL','Apostado BRL','Prêmios BRL','GGR BRL'];rows=reportData.dailyBreakdown.map(r=>[r.date,r.deposits,r.withdrawals,r.netCashflow,r.wagered,r.payouts,r.ggr]);}
+    downloadReportCsv(`relatorio-${subTab}-${selectedPeriod}.csv`,headers,rows);
+  };
 
   return (
     <div className="adm-workspace AdminReportsTab space-y-5">
@@ -90,10 +108,10 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
           <IOSButton
             variant="secondary"
             size="sm"
-            onClick={() => onExportCsv('dre')}
+            onClick={exportCurrent}
           >
             <Download className="w-3.5 h-3.5 text-slate-500" />
-            <span>Exportar CSV</span>
+            <span>Exportar esta visão</span>
           </IOSButton>
 
           <IOSButton
@@ -111,16 +129,19 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
 
       {onOpenMigrationModal && <details className="adm-disclosure"><summary><span><strong>Cópia dos dados</strong><small>Opções de exportação do banco</small></span></summary><div className="adm-disclosure-body adm-export-row"><p>Gere uma cópia para transferência ou armazenamento privado.</p><IOSButton variant="secondary" onClick={onOpenMigrationModal}><Download size={14}/>Exportar banco</IOSButton></div></details>}
 
+      {reportData&&!loading&&<div className="ws-reports ws-report-summary"><WorkspaceFinancialChart rows={reportData.dailyBreakdown.map(r=>({label:r.displayDate||r.date,deposits:r.deposits,withdrawals:r.withdrawals}))}/><p className="ws-report-note">Período retornado: {new Date(reportData.startTime).toLocaleDateString('pt-BR')} a {new Date(reportData.endTime).toLocaleDateString('pt-BR')}. Fluxo de caixa é a diferença entre entradas e saídas; não substitui a apuração contábil.</p></div>}
       {/* Sub-Navigation */}
       <div className="flex items-center overflow-x-auto pb-1">
         <IOSSegmentedControl
           options={subTabOptions}
           value={subTab}
-          onChange={setSubTab}
+          onChange={(tab)=>{setSubTab(tab);setQuery('');setTransactionStatus('all');setVisibleTransactions(50);}}
           className="w-full sm:w-auto"
         />
       </div>
 
+      {['affiliates','players','transactions'].includes(subTab)&&<div className="ws-report-search"><input aria-label="Buscar no relatório" placeholder="Buscar por nome, e-mail ou identificação…" value={query} onChange={e=>{setQuery(e.target.value);setVisibleTransactions(50);}}/>{subTab==='transactions'&&<select aria-label="Filtrar status" value={transactionStatus} onChange={e=>{setTransactionStatus(e.target.value);setVisibleTransactions(50);}}><option value="all">Todos os status</option><option value="approved">Aprovados</option><option value="pending">Pendentes</option><option value="rejected">Rejeitados</option></select>}<span className="ws-report-note">{subTab==='affiliates'?affiliates.length:subTab==='players'?players.length:transactions.length} resultado(s) nos dados carregados</span></div>}
+      {subTab==='transactions'&&transactions.length>visibleTransactions&&<div className="ws-reports"><button onClick={()=>setVisibleTransactions(n=>n+50)}>Carregar mais transações ({Math.min(visibleTransactions,transactions.length)} de {transactions.length})</button></div>}
       {loading ? (
         <IOSCard className="p-12 text-center text-slate-400 text-xs font-semibold flex items-center justify-center gap-2">
           <InexLoader compact />
@@ -141,7 +162,7 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
                   value={`R$ ${(summary?.grossDeposits || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                   subtitle={`${summary?.grossDepositsCount || 0} depósitos pagos`}
                   icon={ArrowDownLeft}
-                  iconBgColor="bg-[#34C759]"
+                  iconBgColor="bg-[#657466]"
                   isPositive={true}
                 />
 
@@ -150,15 +171,15 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
                   value={`R$ ${(summary?.totalWithdrawals || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                   subtitle={`${summary?.totalWithdrawalsCount || 0} saques liquidados`}
                   icon={ArrowUpRight}
-                  iconBgColor="bg-[#FF9500]"
+                  iconBgColor="bg-[#7c7469]"
                 />
 
                 <IOSStatCard
                   title="GGR Operacional"
                   value={`R$ ${(summary?.ggr || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-                  subtitle={`RTP Real: ${(summary?.realRtpPercent || 88).toFixed(1)}%`}
+                  subtitle={`RTP Real: ${(summary?.realRtpPercent ?? 0).toFixed(1)}%`}
                   icon={TrendingUp}
-                  iconBgColor="bg-[#007AFF]"
+                  iconBgColor="bg-[#596777]"
                   isPositive={true}
                 />
 
@@ -167,7 +188,7 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
                   value={`R$ ${(summary?.netCashflow || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
                   subtitle={`Margem: ${(summary?.netOperatingMargin || 0).toFixed(1)}%`}
                   icon={DollarSign}
-                  iconBgColor="bg-[#5856D6]"
+                  iconBgColor="bg-[#697587]"
                   isPositive={(summary?.netCashflow || 0) >= 0}
                 />
               </div>
@@ -177,10 +198,10 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
                 <div className="flex items-center justify-between border-b border-black/[0.04] pb-3">
                   <div>
                     <h3 className="font-bold text-base text-slate-900 tracking-tight">
-                      Demonstrativo de Resultado do Exercício (DRE)
+                      Resumo operacional de caixa
                     </h3>
                     <p className="text-xs text-slate-400 font-medium">
-                      Visão contábil e de conciliação das operações da plataforma
+                      Indicadores operacionais do período selecionado
                     </p>
                   </div>
                   <IOSBadge variant="blue">Período Selecionado</IOSBadge>
@@ -189,14 +210,14 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
                 <div className="divide-y divide-black/[0.04] text-xs">
                   <div className="py-2.5 flex items-center justify-between">
                     <span className="font-bold text-slate-900">1. RECEITA BRUTA DE DEPÓSITOS (PIX)</span>
-                    <span className="font-mono font-bold text-[#34C759]">
+                    <span className="font-mono font-bold text-[#657466]">
                       +R$ {(summary?.grossDeposits || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
 
                   <div className="py-2.5 flex items-center justify-between pl-4">
                     <span className="text-slate-600">(-) Saques Aprovados aos Usuários</span>
-                    <span className="font-mono font-semibold text-[#FF3B30]">
+                    <span className="font-mono font-semibold text-[#986a70]">
                       -R$ {(summary?.totalWithdrawals || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
@@ -210,7 +231,7 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
 
                   <div className="py-2.5 flex items-center justify-between">
                     <span className="font-bold text-slate-900">2. RESULTADO DE JOGOS & APOSTAS (GGR)</span>
-                    <span className="font-mono font-bold text-[#007AFF]">
+                    <span className="font-mono font-bold text-[#596777]">
                       +R$ {(summary?.ggr || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
@@ -231,14 +252,14 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
 
                   <div className="py-2.5 flex items-center justify-between pl-4">
                     <span className="text-slate-600">(-) Comissões Pagas sobre Depósitos à Rede de Afiliados</span>
-                    <span className="font-mono font-semibold text-[#AF52DE]">
+                    <span className="font-mono font-semibold text-[#737080]">
                       -R$ {(summary?.totalAffiliateCommissions || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
 
-                  <div className="py-3 flex items-center justify-between bg-[#34C759]/10 px-3 rounded-xl font-bold text-sm">
+                  <div className="py-3 flex items-center justify-between bg-[#657466]/10 px-3 rounded-xl font-bold text-sm">
                     <span className="text-slate-900">(=) LUCRO LÍQUIDO OPERACIONAL (NGR)</span>
-                    <span className="font-mono text-[#248A3D]">
+                    <span className="font-mono text-[#59685d]">
                       R$ {(summary?.ngr || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
@@ -261,10 +282,10 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
 
                 <IOSStatCard
                   title="RTP Efetivo Médio"
-                  value={`${(summary?.realRtpPercent || 88).toFixed(1)}%`}
+                  value={`${(summary?.realRtpPercent ?? 0).toFixed(1)}%`}
                   subtitle={`Target do sistema: ~88%`}
                   icon={Percent}
-                  iconBgColor="bg-[#007AFF]"
+                  iconBgColor="bg-[#596777]"
                   isPositive={true}
                 />
 
@@ -273,7 +294,7 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
                   value={`${(summary?.winRatePercent || 42.5).toFixed(1)}%`}
                   subtitle={`${summary?.winsCount || 0} vitórias / ${summary?.lossesCount || 0} derrotas`}
                   icon={Award}
-                  iconBgColor="bg-[#34C759]"
+                  iconBgColor="bg-[#657466]"
                 />
               </div>
             </div>
@@ -301,12 +322,12 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-black/[0.04]">
-                      {reportData.affiliateRanking.map((aff, idx) => (
+                      {affiliates.map((aff, idx) => (
                         <tr key={aff.affiliateId || `aff-${idx}`} className="hover:bg-black/[0.015]">
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-2.5">
                               <span className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
-                                idx === 0 ? 'bg-[#FF9500] text-white' : idx === 1 ? 'bg-slate-300 text-slate-800' : 'bg-slate-100 text-slate-600'
+                                idx === 0 ? 'bg-[#7c7469] text-white' : idx === 1 ? 'bg-slate-300 text-slate-800' : 'bg-slate-100 text-slate-600'
                               }`}>
                                 {idx + 1}
                               </span>
@@ -316,19 +337,19 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
                               </div>
                             </div>
                           </td>
-                          <td className="py-3.5 px-4 font-mono font-bold text-[#007AFF]">
+                          <td className="py-3.5 px-4 font-mono font-bold text-[#596777]">
                             {aff.referralCode}
                           </td>
                           <td className="py-3.5 px-4 text-center font-bold text-slate-900">
                             {aff.totalReferrals}
                           </td>
-                          <td className="py-3.5 px-4 text-center font-semibold text-[#34C759]">
+                          <td className="py-3.5 px-4 text-center font-semibold text-[#657466]">
                             {aff.ftdCount}
                           </td>
                           <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-900">
                             R$ {aff.referralDepositsTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </td>
-                          <td className="py-3.5 px-4 text-right font-mono font-bold text-[#AF52DE]">
+                          <td className="py-3.5 px-4 text-right font-mono font-bold text-[#737080]">
                             R$ {aff.commissionTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </td>
                         </tr>
@@ -364,7 +385,7 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-black/[0.04]">
-                      {reportData.topProfitablePlayers.map((p, idx) => (
+                      {players.map((p, idx) => (
                         <tr key={p.userId || `p-${idx}`} className="hover:bg-black/[0.015]">
                           <td className="py-3.5 px-4">
                             <div className="font-bold text-slate-900">{p.name}</div>
@@ -373,16 +394,16 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
                           <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-900">
                             R$ {p.currentBalance.toFixed(2)}
                           </td>
-                          <td className="py-3.5 px-4 text-right font-mono font-semibold text-[#34C759]">
+                          <td className="py-3.5 px-4 text-right font-mono font-semibold text-[#657466]">
                             R$ {p.totalDeposited.toFixed(2)}
                           </td>
-                          <td className="py-3.5 px-4 text-right font-mono font-semibold text-[#FF9500]">
+                          <td className="py-3.5 px-4 text-right font-mono font-semibold text-[#7c7469]">
                             R$ {p.totalWithdrawn.toFixed(2)}
                           </td>
                           <td className="py-3.5 px-4 text-right font-mono text-slate-700">
                             R$ {p.totalWagered.toFixed(2)}
                           </td>
-                          <td className="py-3.5 px-4 text-right font-mono font-bold text-[#007AFF]">
+                          <td className="py-3.5 px-4 text-right font-mono font-bold text-[#596777]">
                             R$ {p.ggrGenerated.toFixed(2)}
                           </td>
                         </tr>
@@ -417,7 +438,7 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-black/[0.04]">
-                      {reportData.transactions.slice(0, 50).map((t) => {
+                      {transactions.slice(0, visibleTransactions).map((t) => {
                         const isDep = t.type === 'deposit';
                         return (
                           <tr key={t.id} className="hover:bg-black/[0.015]">
@@ -430,7 +451,7 @@ export const AdminReportsTab: React.FC<AdminReportsTabProps> = ({
                                 {isDep ? 'Depósito PIX' : 'Saque PIX'}
                               </IOSBadge>
                             </td>
-                            <td className={`py-3 px-4 text-right font-mono font-bold ${isDep ? 'text-[#34C759]' : 'text-[#FF9500]'}`}>
+                            <td className={`py-3 px-4 text-right font-mono font-bold ${isDep ? 'text-[#657466]' : 'text-[#7c7469]'}`}>
                               {isDep ? '+' : '-'}R$ {t.amount.toFixed(2)}
                             </td>
                             <td className="py-3 px-4 text-center">

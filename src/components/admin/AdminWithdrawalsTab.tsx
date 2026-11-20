@@ -113,7 +113,7 @@ export const AdminWithdrawalsTab: React.FC<AdminWithdrawalsTabProps> = ({
           value={`R$ ${pendingTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           subtitle={`${pendingList.length} solicitações aguardando liberação`}
           icon={Clock}
-          iconBgColor="bg-[#FF9500]"
+          iconBgColor="bg-[#7c7469]"
           change={pendingList.length > 0 ? `${pendingList.length} pendentes` : undefined}
           isPositive={false}
         />
@@ -123,7 +123,7 @@ export const AdminWithdrawalsTab: React.FC<AdminWithdrawalsTabProps> = ({
           value={`R$ ${approvedTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           subtitle={`${approvedList.length} pagamentos realizados`}
           icon={CheckCircle2}
-          iconBgColor="bg-[#34C759]"
+          iconBgColor="bg-[#657466]"
           isPositive={true}
         />
 
@@ -132,7 +132,7 @@ export const AdminWithdrawalsTab: React.FC<AdminWithdrawalsTabProps> = ({
           value={withdrawals.length}
           subtitle={`Histórico completo de pedidos de saque`}
           icon={ArrowUpRight}
-          iconBgColor="bg-[#007AFF]"
+          iconBgColor="bg-[#596777]"
         />
       </div>
 
@@ -168,7 +168,7 @@ export const AdminWithdrawalsTab: React.FC<AdminWithdrawalsTabProps> = ({
           </div>
         ) : filteredWithdrawals.length === 0 ? (
           <div className="p-12 text-center space-y-2">
-            <CheckCircle2 className="w-10 h-10 text-[#34C759]/60 mx-auto" />
+            <CheckCircle2 className="w-10 h-10 text-[#657466]/60 mx-auto" />
             <p className="text-sm font-bold text-slate-800">
               {filter === 'pending'
                 ? 'Nenhum saque pendente no momento!'
@@ -250,11 +250,11 @@ export const AdminWithdrawalsTab: React.FC<AdminWithdrawalsTabProps> = ({
                             <button
                               type="button"
                               onClick={() => onCopyText(pixKeyVal, 'Chave PIX')}
-                              className="inline-flex items-center gap-1 text-xs font-mono font-semibold text-[#007AFF] hover:underline cursor-pointer"
+                              className="inline-flex items-center gap-1 text-xs font-mono font-semibold text-[#596777] hover:underline cursor-pointer"
                               title="Copiar chave PIX"
                             >
                               {copiedText === pixKeyVal ? (
-                                <Check className="w-3 h-3 text-[#34C759]" />
+                                <Check className="w-3 h-3 text-[#657466]" />
                               ) : (
                                 <Copy className="w-3 h-3" />
                               )}
@@ -293,7 +293,7 @@ export const AdminWithdrawalsTab: React.FC<AdminWithdrawalsTabProps> = ({
                               type="button"
                               disabled={isBusy || gatewayLocked}
                               onClick={() => onApproveWithdrawal(item.id)}
-                              className="h-7 px-2.5 rounded-lg bg-[#34C759] hover:bg-[#28A745] text-white font-bold text-xs flex items-center gap-1 shadow-xs cursor-pointer active:scale-[0.98] transition-all disabled:opacity-40"
+                              className="h-7 px-2.5 rounded-lg bg-[#657466] hover:bg-[#28A745] text-white font-bold text-xs flex items-center gap-1 shadow-xs cursor-pointer active:scale-[0.98] transition-all disabled:opacity-40"
                               title="Aprovar PIX"
                             >
                               {isBusy ? <InexLoader compact /> : <Check className="w-3 h-3" />}
@@ -304,7 +304,7 @@ export const AdminWithdrawalsTab: React.FC<AdminWithdrawalsTabProps> = ({
                               type="button"
                               disabled={isBusy || gatewayLocked}
                               onClick={() => onRejectWithdrawal(item.id)}
-                              className="h-7 px-2 rounded-lg bg-[#FF3B30]/12 hover:bg-[#FF3B30]/20 text-[#FF3B30] font-bold text-xs flex items-center gap-1 cursor-pointer active:scale-[0.98] transition-all disabled:opacity-40"
+                              className="h-7 px-2 rounded-lg bg-[#986a70]/12 hover:bg-[#986a70]/20 text-[#986a70] font-bold text-xs flex items-center gap-1 cursor-pointer active:scale-[0.98] transition-all disabled:opacity-40"
                               title="Rejeitar e Devolver Saldo"
                             >
                               <XCircle className="w-3 h-3" />

@@ -305,14 +305,14 @@ export const AdminLivePlayersTab: React.FC<AdminLivePlayersTabProps> = ({
             className="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
             title="Atualizar Agora"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[#007AFF]' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[#596777]' : ''}`} />
             <span>Atualizar</span>
           </button>
 
           <button
             type="button"
             onClick={() => onNavigateTab('games')}
-            className="px-3 py-2 rounded-xl text-xs font-semibold bg-[#007AFF] hover:bg-[#0062CC] text-white flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+            className="px-3 py-2 rounded-xl text-xs font-semibold bg-[#596777] hover:bg-[#596777] text-white flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
           >
             <Sliders className="w-3.5 h-3.5" />
             <span>Gerenciar RTP & Jogos</span>
@@ -374,7 +374,7 @@ export const AdminLivePlayersTab: React.FC<AdminLivePlayersTabProps> = ({
             </span>
             <DollarSign className="w-4 h-4 text-blue-500" />
           </div>
-          <div className="mt-2 text-2xl sm:text-3xl font-extrabold text-[#007AFF]">
+          <div className="mt-2 text-2xl sm:text-3xl font-extrabold text-[#596777]">
             {formatCurrency(data?.totalVolumeInPlay ?? 0)}
           </div>
           <p className="mt-1 text-[11px] text-slate-400">
@@ -442,7 +442,7 @@ export const AdminLivePlayersTab: React.FC<AdminLivePlayersTabProps> = ({
                 onClick={() => setSelectedGameFilter(isSelected ? 'all' : game.gameId)}
                 className={`p-4 rounded-2xl text-left transition-all border cursor-pointer ${
                   isSelected
-                    ? 'bg-[#007AFF]/10 border-[#007AFF] shadow-sm ring-1 ring-[#007AFF]'
+                    ? 'bg-[#596777]/10 border-[#596777] shadow-sm ring-1 ring-[#596777]'
                     : 'bg-white border-black/[0.04] hover:border-slate-300 hover:shadow-2xs'
                 }`}
               >
@@ -483,7 +483,7 @@ export const AdminLivePlayersTab: React.FC<AdminLivePlayersTabProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-black/[0.04] pb-4">
               <div>
                 <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-[#007AFF]" />
+                  <Users className="w-4 h-4 text-[#596777]" />
                   <span>Sessões Ativas em Execução</span>
                   <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-xs border border-emerald-200">
                     {filteredSessions.length} jogadores
@@ -507,7 +507,7 @@ export const AdminLivePlayersTab: React.FC<AdminLivePlayersTabProps> = ({
                   <button
                     type="button"
                     onClick={() => setSelectedGameFilter('all')}
-                    className="text-xs font-semibold text-[#007AFF] hover:underline cursor-pointer shrink-0"
+                    className="text-xs font-semibold text-[#596777] hover:underline cursor-pointer shrink-0"
                   >
                     Ver Todos
                   </button>
@@ -555,7 +555,7 @@ export const AdminLivePlayersTab: React.FC<AdminLivePlayersTabProps> = ({
 
             {loading ? (
               <div className="py-16 text-center space-y-3">
-                <RefreshCw className="w-8 h-8 text-[#007AFF] animate-spin mx-auto" />
+                <RefreshCw className="w-8 h-8 text-[#596777] animate-spin mx-auto" />
                 <p className="text-xs text-slate-400 font-medium">
                   Sintonizando satélites de dados dos jogos...
                 </p>
@@ -729,7 +729,7 @@ export const AdminLivePlayersTab: React.FC<AdminLivePlayersTabProps> = ({
                   <div className="text-[10px] font-bold text-slate-400">
                     {hourItem.hour}
                   </div>
-                  <div className="text-sm font-extrabold text-[#007AFF] mt-0.5">
+                  <div className="text-sm font-extrabold text-[#596777] mt-0.5">
                     {hourItem.players}
                   </div>
                   <div className="text-[9px] text-slate-500 font-medium truncate">
@@ -745,10 +745,10 @@ export const AdminLivePlayersTab: React.FC<AdminLivePlayersTabProps> = ({
         <div className="space-y-6">
           {/* Selected Session Inspector Modal/Card if clicked */}
           {selectedSession ? (
-            <IOSCard className="p-5 space-y-4 border-2 border-[#007AFF]/30 bg-blue-50/20">
+            <IOSCard className="p-5 space-y-4 border-2 border-[#596777]/30 bg-blue-50/20">
               <div className="flex items-center justify-between border-b border-blue-100 pb-3">
                 <div className="flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-[#007AFF]" />
+                  <Sliders className="w-4 h-4 text-[#596777]" />
                   <h4 className="font-bold text-sm text-slate-900">
                     Controle de Sessão Ao Vivo
                   </h4>
